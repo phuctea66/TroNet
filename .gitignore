@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.local
+.agents/skills/*
+!.agents/skills/ui-ux-pro-max/
+!.agents/skills/ui-ux-pro-max/**
