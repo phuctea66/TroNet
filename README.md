@@ -12,6 +12,7 @@ Các cấu hình Vite, Tailwind, PostCSS, `package.json` và `index.html` giữ 
 .
 ├── README.md
 ├── .gitignore
+├── .github/workflows/deploy.yml # Build và deploy GitHub Pages
 ├── index.html
 ├── package.json
 ├── package-lock.json
@@ -58,7 +59,7 @@ Lệnh khởi tạo project React + Vite và cài các thư viện được sử
 
 ```bash
 npm create vite@latest tronest -- --template react
-cd tronest
+cd tronet
 npm install
 npm install react-router-dom lucide-react
 npm install -D tailwindcss postcss autoprefixer
@@ -73,6 +74,10 @@ npm run dev
 ```
 
 Vite sẽ in địa chỉ local trong terminal, thường là `http://localhost:5173`. Tạo bản production bằng `npm run build`.
+
+### Deploy GitHub Pages
+
+Workflow `.github/workflows/deploy.yml` tự build và deploy khi có push lên `main`. Trong repository, đặt **Settings → Pages → Build and deployment → Source** thành **GitHub Actions**. Vite tự dùng base path theo tên repository trong Actions; router dùng URL hash để các trang con vẫn tải được trên GitHub Pages.
 
 ### Tài khoản demo
 
