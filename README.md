@@ -73,9 +73,6 @@ npm run dev
 
 Vite sẽ in địa chỉ local trong terminal, thường là `http://localhost:5173`. Tạo bản production bằng `npm run build`.
 
-### Deploy GitHub Pages
-
-Workflow `.github/workflows/deploy.yml` tự build và deploy khi có push lên `main`. Trong repository, đặt **Settings → Pages → Build and deployment → Source** thành **GitHub Actions**. Vite tự dùng base path theo tên repository trong Actions; router dùng URL hash để các trang con vẫn tải được trên GitHub Pages.
 
 ### Tài khoản demo
 
