@@ -1,88 +1,142 @@
 # TroNest
 
-Frontend demo giúp sinh viên và người đi làm tìm phòng trọ, tìm bạn ở ghép và trải nghiệm các luồng kết nối mô phỏng.
+Website demo nền tảng hỗ trợ sinh viên và người đi làm **tìm phòng trọ** và **tìm bạn ở ghép** với các tính năng kết nối và nhắn tin mô phỏng.
 
-## 1. Kế hoạch và cấu trúc dự án
+---
 
-Triển khai giao diện responsive bằng React + Vite, dùng React Router cho điều hướng, Tailwind CSS cho cấu hình giao diện và Lucide cho biểu tượng. Dữ liệu mẫu nằm trong `src/data/`; dữ liệu người dùng tạo được lưu trong `localStorage`.
+## 1. Cấu trúc thư mục dự án
 
+Toàn bộ cấu trúc thư mục của dự án:
 
 ```text
 .
-├── README.md
-├── .gitignore
-├── .github/workflows/deploy.yml # Build và deploy GitHub Pages
-├── index.html
-├── package.json
-├── package-lock.json
-├── postcss.config.js
-├── tailwind.config.js
-├── vite.config.js
+├── README.md                           # Hướng dẫn dự án và tài liệu khởi chạy
+├── .gitignore                          # Cấu hình bỏ qua file trong git
+├── .github/
+│   └── workflows/
+│       └── deploy.yml                  # CI/CD tự động build và deploy lên GitHub Pages
+├── index.html                          # File HTML gốc (Plus Jakarta Sans, viewport chuẩn)
+├── package.json                        # Cấu hình dự án, scripts và danh sách dependencies
+├── package-lock.json                   # Khóa phiên bản dependencies
+├── postcss.config.js                   # Cấu hình PostCSS cho Tailwind CSS
+├── tailwind.config.js                  # Cấu hình theme màu (đỏ đô #700404, vàng #FFF012, trắng ngà #F4F7F9)
+├── vite.config.js                      # Cấu hình Vite (hỗ trợ cả local lẫn GitHub Pages base path)
 ├── docs/
-│   └── tronest-prompt.md   # Prompt/yêu cầu sản phẩm gốc
+│   └── tronest-prompt.md               # File yêu cầu và đặc tả sản phẩm gốc
 ├── src/
-│   ├── App.jsx             # Trang, routing, các luồng giao diện và localStorage
-│   ├── main.jsx            # Điểm khởi chạy React
-│   ├── index.css           # Style responsive và token giao diện
+│   ├── App.jsx                         # Component chính: routing, các trang, modal và state
+│   ├── main.jsx                        # Điểm khởi chạy React (dùng HashRouter cho tương thích mọi server)
+│   ├── index.css                       # Design system, CSS variables, typography và responsive styling
 │   ├── data/
-│   │   ├── mockRooms.js
-│   │   ├── mockProfiles.js
-│   │   └── mockConnections.js
+│   │   ├── mockRooms.js                # Dữ liệu mẫu danh sách phòng trọ
+│   │   ├── mockProfiles.js             # Dữ liệu mẫu hồ sơ ở ghép (cả có phòng và cần tìm phòng)
+│   │   └── mockConnections.js          # Dữ liệu mẫu yêu cầu kết nối và tin nhắn chat ban đầu
 │   └── utils/
-│       ├── compatibility.js
-│       └── validators.js
-└── .agents/skills/ui-ux-pro-max/ # Skill UI/UX của project
+│       ├── compatibility.js            # Thuật toán tính điểm tương thích (0–100%) giữa 2 hồ sơ
+│       └── validators.js               # Các hàm kiểm tra tính hợp lệ dữ liệu biểu mẫu
+└── .agents/skills/ui-ux-pro-max/       # Bộ công cụ và quy chuẩn UI/UX của dự án
 ```
 
+---
 
-## 2. Mã nguồn đầy đủ
+## 2. Mã nguồn chi tiết các module
 
-Mã nguồn đầy đủ của ứng dụng được lưu trong các file sau, không rút gọn bằng dấu `...`:
+Toàn bộ mã nguồn của ứng dụng nằm tại các file sau (đầy đủ 100%, không viết tắt hay dùng `...`):
 
-- Ứng dụng, routing, component và state: [src/App.jsx](src/App.jsx)
-- Điểm khởi chạy: [src/main.jsx](src/main.jsx)
-- Giao diện responsive: [src/index.css](src/index.css)
-- Dữ liệu phòng: [src/data/mockRooms.js](src/data/mockRooms.js)
-- Dữ liệu hồ sơ: [src/data/mockProfiles.js](src/data/mockProfiles.js)
-- Kết nối và tin nhắn mẫu: [src/data/mockConnections.js](src/data/mockConnections.js)
-- Công thức tương thích: [src/utils/compatibility.js](src/utils/compatibility.js)
-- Kiểm tra biểu mẫu: [src/utils/validators.js](src/utils/validators.js)
-- Prompt yêu cầu gốc: [docs/tronest-prompt.md](docs/tronest-prompt.md)
-- Skill giao diện: [.agents/skills/ui-ux-pro-max/SKILL.md](.agents/skills/ui-ux-pro-max/SKILL.md)
-- Cấu hình project: [package.json](package.json), [tailwind.config.js](tailwind.config.js), [postcss.config.js](postcss.config.js), [vite.config.js](vite.config.js)
+- **Giao diện & Logic luồng**: [src/App.jsx](src/App.jsx)
+- **Khởi chạy React Root**: [src/main.jsx](src/main.jsx)
+- **Stylesheet & Design Tokens**: [src/index.css](src/index.css)
+- **Dữ liệu phòng trọ**: [src/data/mockRooms.js](src/data/mockRooms.js)
+- **Dữ liệu hồ sơ người dùng**: [src/data/mockProfiles.js](src/data/mockProfiles.js)
+- **Dữ liệu kết nối & Chat**: [src/data/mockConnections.js](src/data/mockConnections.js)
+- **Hàm tính tương thích (Roommate Match)**: [src/utils/compatibility.js](src/utils/compatibility.js)
+- **Xác thực biểu mẫu (Validation)**: [src/utils/validators.js](src/utils/validators.js)
+- **Prompt yêu cầu gốc**: [docs/tronest-prompt.md](docs/tronest-prompt.md)
 
-## 3. Khởi tạo và chạy local
+---
 
-Lệnh khởi tạo project React + Vite và cài các thư viện được sử dụng:
+## 3. Hướng dẫn khởi chạy dự án
+
+### Yêu cầu môi trường
+- **Node.js**: Phiên bản `18.0.0` trở lên (khuyên dùng Node `20.x` hoặc `22.x`)
+- **Trình quản lý gói**: `npm` (đi kèm Node.js)
+
+---
+
+### Cách 1: Chạy từ mã nguồn có sẵn (Khuyên dùng)
+
+Khi bạn hoặc người khác đã có mã nguồn dự án (sau khi `git clone` hoặc giải nén thư mục), chỉ cần thực hiện 2 bước:
 
 ```bash
-npm create vite@latest tronest -- --template react
-cd tronet
+# Bước 1: Cài đặt toàn bộ thư viện dependencies
 npm install
-npm install react-router-dom lucide-react
+
+# Bước 2: Khởi chạy môi trường phát triển local
+npm run dev
+```
+
+Sau khi chạy lệnh trên, terminal sẽ hiển thị địa chỉ truy cập local:
+```text
+  VITE v5.4.11  ready in ~300 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+```
+
+👉 Mở trình duyệt và truy cập: **`http://localhost:5173`**
+
+---
+
+### Cách 2: Đóng gói bản Production (Build & Preview)
+
+Để kiểm tra bản đóng gói sản phẩm trước khi đưa lên môi trường hosting:
+
+```bash
+# Biên dịch mã nguồn thành file tĩnh trong thư mục dist/
+npm run build
+
+# Chạy server thử nghiệm bản build
+npm run preview
+```
+
+---
+
+### (Tham khảo) Các bước đã dùng để thiết lập dự án ban đầu
+
+Nếu cần tái tạo lại toàn bộ cấu trúc dự án từ một thư mục trống:
+
+```bash
+# 1. Khởi tạo template React với Vite
+npm create vite@latest TroNet -- --template react
+cd TroNet
+
+# 2. Cài đặt các dependencies cần thiết
+npm install react-router-dom lucide-react clsx tailwind-merge
+
+# 3. Cài đặt công cụ giao diện Tailwind CSS
 npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 ```
 
-Project hiện tại đã có cấu hình và dependency. Để chạy local:
+---
 
-```bash
-npm install
-npm run dev
-```
+## 4. Tài khoản Demo có sẵn
 
-Vite sẽ in địa chỉ local trong terminal, thường là `http://localhost:5173`. Tạo bản production bằng `npm run build`.
+Hệ thống có sẵn các tài khoản demo để người dùng trải nghiệm đầy đủ các phân quyền:
 
+| Loại tài khoản | Email đăng nhập | Mật khẩu | Quyền hạn và tính năng |
+|---|---|---|---|
+| **Người dùng (User)** | `user@tronest.demo` | `123456` | Alex Nguyen: Xem phòng, đặt lịch, tạo hồ sơ, gửi/nhận kết nối và chat trực tiếp |
+| **Quản trị viên (Admin)** | `admin@tronest.demo` | `admin123` | Jamie (Admin): Truy cập trang Quản trị (`#/admin`), duyệt/từ chối tin đăng, ẩn/khôi phục tin |
 
-### Tài khoản demo
+> **Mẹo:** Trên trang Đăng nhập (`#/login`), có sẵn 2 nút bấm nhanh **Quick Demo Sign In** cho User và Admin giúp đăng nhập chỉ với 1 click mà không cần gõ phím.
 
-- User: `user@tronest.demo` / `123456`
-- Admin: `admin@tronest.demo` / `admin123`
+---
 
-## 4. Giả định
+## 5. Các lưu ý & Giả định kỹ thuật
 
-- Đây là frontend demo, không có backend hoặc cơ sở dữ liệu thật; mỗi trình duyệt/thiết bị có dữ liệu `localStorage` riêng.
-- Người dùng yêu cầu UI bằng tiếng Anh, nên nội dung giao diện dùng tiếng Anh dù prompt gốc có phần yêu cầu tiếng Việt.
-- Đăng nhập, quyền Admin, yêu cầu kết nối và chat chỉ mô phỏng.
-- Ảnh phòng và avatar dùng URL minh họa; dữ liệu tạo/phê duyệt không đồng bộ giữa các thiết bị.
-- Nút **Reset demo data** ở chân trang khôi phục dữ liệu mẫu trên thiết bị hiện tại.
+1. **Frontend-Only & Mock Data**: Ứng dụng chạy hoàn toàn ở frontend, không yêu cầu cơ sở dữ liệu thật hay API server bên ngoài.
+2. **Lưu trữ `localStorage`**: Dữ liệu phòng mới đăng, hồ sơ mới tạo, yêu cầu kết nối và tin nhắn chat được tự động đồng bộ vào `localStorage` của trình duyệt. Tải lại trang (F5) không bị mất dữ liệu.
+3. **Nút Reset dữ liệu**: Ở chân trang (Footer), có nút **"Reset demo data"** cho phép khôi phục lại dữ liệu mẫu gốc ban đầu bất cứ lúc nào.
+4. **Định tuyến `HashRouter`**: Ứng dụng sử dụng `HashRouter` (`#/rooms`, `#/roommates`,...) giúp website hoạt động mượt mà trên tất cả các loại static host (GitHub Pages, Vercel, Netlify, Apache, Nginx) mà không bao giờ gặp lỗi 404 khi người dùng tải lại trang.
+5. **Responsive**: Giao diện hiển thị tối ưu trên cả máy tính (desktop), máy tính bảng (tablet) và điện thoại di động (mobile-first), đáp ứng đầy đủ tiêu chuẩn trợ năng WCAG 2.2 AA.
