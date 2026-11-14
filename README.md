@@ -6,7 +6,6 @@ Frontend demo giúp sinh viên và người đi làm tìm phòng trọ, tìm b�
 
 Triển khai giao diện responsive bằng React + Vite, dùng React Router cho điều hướng, Tailwind CSS cho cấu hình giao diện và Lucide cho biểu tượng. Dữ liệu mẫu nằm trong `src/data/`; dữ liệu người dùng tạo được lưu trong `localStorage`.
 
-Các cấu hình Vite, Tailwind, PostCSS, `package.json` và `index.html` giữ ở thư mục root theo quy ước để công cụ build tìm thấy chúng.
 
 ```text
 .
@@ -35,7 +34,6 @@ Các cấu hình Vite, Tailwind, PostCSS, `package.json` và `index.html` giữ 
 └── .agents/skills/ui-ux-pro-max/ # Skill UI/UX của project
 ```
 
-`node_modules/` và `dist/` do npm/Vite tạo ra; chúng ở root theo chuẩn nhưng không phải source để đưa vào `src/`.
 
 ## 2. Mã nguồn đầy đủ
 

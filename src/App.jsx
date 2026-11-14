@@ -173,10 +173,22 @@ function Header() {
           {user?.role === "admin" && <NavLink to="/admin">Admin</NavLink>}
           {user ? (
             <div className="user-nav">
-              <span className="avatar avatar-small">
-                {user.name?.[0] || "A"}
-              </span>
-              <span>{user.name}</span>
+              <img
+                className="avatar avatar-small"
+                src={
+                  user.avatar ||
+                  (user.role === "admin"
+                    ? "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80"
+                    : "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80")
+                }
+                alt={user.name}
+              />
+              <div className="user-nav-details">
+                <span className="user-nav-name">{user.name}</span>
+                <span className={`role-pill role-pill-${user.role || "user"}`}>
+                  {user.role === "admin" ? "Admin" : "User"}
+                </span>
+              </div>
               <button
                 className="text-button"
                 onClick={() => {
@@ -212,7 +224,7 @@ function Footer() {
           <Link to="/login">Demo login</Link>
         </div>
         <div className="footer-note">
-          Made for your next chapter <span>✳</span>
+          Made for your next chapter <Sparkles size={14} className="inline text-brand-gold" aria-hidden="true" />
         </div>
       </div>
       <div className="container footer-bottom">
@@ -241,8 +253,11 @@ function Footer() {
 function Shell({ children }) {
   return (
     <>
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Header />
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
       <Footer />
     </>
   );
@@ -254,7 +269,11 @@ function RoomCard({ room, compact = false }) {
       className={`room-card ${compact ? "room-card-compact" : ""}`}
     >
       <div className="room-image-wrap">
-        <img src={room.images?.[0] || areaImages[0]} alt={room.title} />
+        <img
+          src={room.images?.[0] || areaImages[0]}
+          alt={room.title}
+          loading="lazy"
+        />
         <span className="image-tag">{room.area}</span>
         <button
           className="heart-button"
@@ -262,9 +281,9 @@ function RoomCard({ room, compact = false }) {
             e.preventDefault();
             e.currentTarget.classList.toggle("liked");
           }}
-          aria-label="Save room"
+          aria-label={`Save ${room.title} to favorites`}
         >
-          <Heart size={18} />
+          <Heart size={20} aria-hidden="true" />
         </button>
       </div>
       <div className="room-card-content">
@@ -276,20 +295,20 @@ function RoomCard({ room, compact = false }) {
           </span>
         </div>
         <p className="muted location">
-          <MapPin size={15} />
+          <MapPin size={15} aria-hidden="true" />
           {room.address}
         </p>
         <div className="room-meta">
           <span>
-            <BedDouble size={15} />
+            <BedDouble size={15} aria-hidden="true" />
             {room.size} m²
           </span>
           <span>
-            <Bath size={15} />
+            <Bath size={15} aria-hidden="true" />
             Private bath
           </span>
           <span>
-            <Wifi size={15} />
+            <Wifi size={15} aria-hidden="true" />
             Wi-Fi
           </span>
         </div>
@@ -305,25 +324,26 @@ function ProfileCard({ profile, matched = false }) {
         <img
           className="avatar avatar-large"
           src={profile.avatar || `https://i.pravatar.cc/180?u=${profile.id}`}
-          alt=""
+          alt={profile.displayName}
+          loading="lazy"
         />
         <div className="profile-title">
           <div className="profile-name-row">
             <h3>{profile.displayName}</h3>
             {matched && (
               <span className="match-pill">
-                <Check size={12} />
+                <Check size={12} aria-hidden="true" />
                 Connected
               </span>
             )}
           </div>
           <p>
-            <MapPin size={14} />
+            <MapPin size={14} aria-hidden="true" />
             {profile.area}
           </p>
         </div>
         <span className="profile-arrow">
-          <ArrowRight size={17} />
+          <ArrowRight size={17} aria-hidden="true" />
         </span>
       </div>
       <div className="profile-type">
@@ -493,7 +513,7 @@ function Home() {
             <span className="floating-caption">
               Good chemistry
               <br />
-              makes a home ✳
+              makes a home <Sparkles size={13} className="inline text-brand-gold" aria-hidden="true" />
             </span>
           </Link>
         </div>
@@ -544,7 +564,9 @@ function Home() {
           <span className="orbit-icon">
             <HomeIcon size={42} />
           </span>
-          <span className="orbit-star">✳</span>
+          <span className="orbit-star">
+            <Sparkles size={32} aria-hidden="true" />
+          </span>
           <span className="orbit-dot" />
         </div>
       </section>
@@ -733,7 +755,7 @@ function RoomDetail() {
         />
         <div>
           {(room.images?.slice(1, 3) || areaImages.slice(1)).map((im, i) => (
-            <img key={i} src={im} alt={`${room.title} view ${i + 2}`} />
+            <img key={i} src={im} alt={`${room.title} view ${i + 2}`} loading="lazy" />
           ))}
         </div>
       </div>
@@ -838,16 +860,29 @@ function Modal({ title, children, close, wide = false }) {
     </div>
   );
 }
-function Field({ label, children, error, required }) {
+function Field({ label, children, error, required, id }) {
+  const errorId = id && error ? `${id}-error` : undefined;
   return (
-    <label className="field">
-      <span>
-        {label}
-        {required && <i> *</i>}
-      </span>
-      {children}
-      {error && <small className="field-error">{error}</small>}
-    </label>
+    <div className="field">
+      {label && (
+        <label htmlFor={id}>
+          {label}
+          {required && <i aria-hidden="true"> *</i>}
+        </label>
+      )}
+      {React.isValidElement(children) && id
+        ? React.cloneElement(children, {
+            id,
+            "aria-invalid": !!error,
+            "aria-describedby": errorId,
+          })
+        : children}
+      {error && (
+        <small id={errorId} className="field-error" role="alert">
+          {error}
+        </small>
+      )}
+    </div>
   );
 }
 function ViewingModal({ room, close, sent }) {
@@ -875,21 +910,23 @@ function ViewingModal({ room, close, sent }) {
         host will contact you to confirm.
       </p>
       <form onSubmit={submit} className="form-stack">
-        <Field label="Your name" required error={err.name}>
+        <Field label="Your name" required error={err.name} id="viewing-name">
           <input
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="e.g. Alex Nguyen"
+            autoComplete="name"
           />
         </Field>
-        <Field label="Phone or email" required error={err.contact}>
+        <Field label="Phone or email" required error={err.contact} id="viewing-contact">
           <input
             value={form.contact}
             onChange={(e) => setForm({ ...form, contact: e.target.value })}
             placeholder="How can the host reach you?"
+            autoComplete="tel email"
           />
         </Field>
-        <Field label="Preferred date & time" required error={err.date}>
+        <Field label="Preferred date & time" required error={err.date} id="viewing-date">
           <input
             type="datetime-local"
             min={new Date(Date.now() + 3600000).toISOString().slice(0, 16)}
@@ -897,7 +934,7 @@ function ViewingModal({ room, close, sent }) {
             onChange={(e) => setForm({ ...form, date: e.target.value })}
           />
         </Field>
-        <Field label="A note for the host">
+        <Field label="A note for the host" id="viewing-note">
           <textarea
             value={form.note}
             onChange={(e) => setForm({ ...form, note: e.target.value })}
@@ -906,7 +943,7 @@ function ViewingModal({ room, close, sent }) {
           />
         </Field>
         <button className="button button-primary button-full">
-          Send viewing request <ArrowRight size={16} />
+          Send viewing request <ArrowRight size={16} aria-hidden="true" />
         </button>
       </form>
     </Modal>
@@ -914,9 +951,9 @@ function ViewingModal({ room, close, sent }) {
 }
 function Toast({ message }) {
   return (
-    <div className="toast">
+    <div className="toast" role="status" aria-live="polite">
       <span>
-        <Check size={17} />
+        <Check size={17} aria-hidden="true" />
       </span>
       {message}
     </div>
@@ -1155,14 +1192,14 @@ function NewRoom() {
       </div>
       <form className="listing-form" onSubmit={submit}>
         <div className="form-grid">
-          <Field label="Listing title" required error={errors.title}>
+          <Field label="Listing title" required error={errors.title} id="room-title">
             <input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="Bright studio near the university"
             />
           </Field>
-          <Field label="Neighborhood" required>
+          <Field label="Neighborhood" required id="room-area">
             <select
               value={form.area}
               onChange={(e) => setForm({ ...form, area: e.target.value })}
@@ -1172,14 +1209,15 @@ function NewRoom() {
               ))}
             </select>
           </Field>
-          <Field label="Street address" required error={errors.address}>
+          <Field label="Street address" required error={errors.address} id="room-address">
             <input
               value={form.address}
               onChange={(e) => setForm({ ...form, address: e.target.value })}
               placeholder="Street, ward, district"
+              autoComplete="street-address"
             />
           </Field>
-          <Field label="Monthly rent (VND)" required error={errors.price}>
+          <Field label="Monthly rent (VND)" required error={errors.price} id="room-price">
             <input
               type="number"
               value={form.price}
@@ -1187,7 +1225,7 @@ function NewRoom() {
               placeholder="e.g. 3500000"
             />
           </Field>
-          <Field label="Room size (m²)" required error={errors.size}>
+          <Field label="Room size (m²)" required error={errors.size} id="room-size">
             <input
               type="number"
               value={form.size}
@@ -1195,41 +1233,39 @@ function NewRoom() {
               placeholder="e.g. 24"
             />
           </Field>
-          <Field label="Contact phone" required error={errors.phone}>
+          <Field label="Contact phone" required error={errors.phone} id="room-phone">
             <input
+              type="tel"
+              autoComplete="tel"
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
               placeholder="0912345678"
             />
           </Field>
-          <Field label="Amenities (comma separated)">
+          <Field label="Amenities (comma separated)" id="room-amenities">
             <input
               value={form.amenities}
               onChange={(e) => setForm({ ...form, amenities: e.target.value })}
             />
           </Field>
-          <Field label="Photo URL">
+          <Field label="Photo URL" id="room-image">
             <input
               value={form.image}
               onChange={(e) => setForm({ ...form, image: e.target.value })}
               placeholder="Optional — we'll add a sample image"
             />
           </Field>
-          <div className="field full-field">
-            <span>
-              Description <i>*</i>
-            </span>
-            <textarea
-              rows="5"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              placeholder="What makes this room special?"
-            />
-            {errors.description && (
-              <small className="field-error">{errors.description}</small>
-            )}
+          <div className="full-field">
+            <Field label="Description" required error={errors.description} id="room-desc">
+              <textarea
+                rows="5"
+                value={form.description}
+                onChange={(e) =>
+                  setForm({ ...form, description: e.target.value })
+                }
+                placeholder="What makes this room special?"
+              />
+            </Field>
           </div>
         </div>
         <div className="form-submit">
@@ -1377,14 +1413,15 @@ function NewProfile() {
           </button>
         </div>
         <div className="form-grid">
-          <Field label="Name or nickname" required error={errors.name}>
+          <Field label="Name or nickname" required error={errors.name} id="profile-name">
             <input
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
               placeholder="What should people call you?"
+              autoComplete="name"
             />
           </Field>
-          <Field label="Neighborhood" required>
+          <Field label="Neighborhood" required id="profile-area">
             <select
               value={form.area}
               onChange={(e) => set("area", e.target.value)}
@@ -1398,6 +1435,7 @@ function NewProfile() {
             label="Monthly budget per person (VND)"
             required
             error={errors.budget}
+            id="profile-budget"
           >
             <input
               type="number"
@@ -1406,7 +1444,7 @@ function NewProfile() {
               placeholder="e.g. 2500000"
             />
           </Field>
-          <Field label="Target move-in date" required error={errors.moveInDate}>
+          <Field label="Target move-in date" required error={errors.moveInDate} id="profile-movein">
             <input
               type="date"
               value={form.moveInDate}
@@ -1415,7 +1453,7 @@ function NewProfile() {
           </Field>
           {type === "has-room" && (
             <>
-              <Field label="Total monthly rent (VND)" required>
+              <Field label="Total monthly rent (VND)" required id="profile-roomrent">
                 <input
                   type="number"
                   value={form.roomRent}
@@ -1423,7 +1461,7 @@ function NewProfile() {
                   placeholder="e.g. 5000000"
                 />
               </Field>
-              <Field label="Your share per person (VND)" required>
+              <Field label="Your share per person (VND)" required id="profile-costperson">
                 <input
                   type="number"
                   value={form.costPerPerson}
@@ -1431,7 +1469,7 @@ function NewProfile() {
                   placeholder="e.g. 2500000"
                 />
               </Field>
-              <Field label="Open spots">
+              <Field label="Open spots" id="profile-slots">
                 <input
                   type="number"
                   min="1"
@@ -1439,7 +1477,7 @@ function NewProfile() {
                   onChange={(e) => set("slotsLeft", e.target.value)}
                 />
               </Field>
-              <Field label="Room size (m²)">
+              <Field label="Room size (m²)" id="profile-size">
                 <input
                   type="number"
                   value={form.size}
@@ -1447,27 +1485,26 @@ function NewProfile() {
                   placeholder="e.g. 30"
                 />
               </Field>
-              <Field label="Amenities">
+              <Field label="Amenities" id="profile-amenities">
                 <input
                   value={form.amenities}
                   onChange={(e) => set("amenities", e.target.value)}
                 />
               </Field>
-              <div className="field full-field">
-                <span>
-                  About the room <i>*</i>
-                </span>
-                <textarea
-                  rows="3"
-                  value={form.roomInfo}
-                  onChange={(e) => set("roomInfo", e.target.value)}
-                  placeholder="Describe the room and living arrangement"
-                />
+              <div className="full-field">
+                <Field label="About the room" required error={errors.roomInfo} id="profile-roominfo">
+                  <textarea
+                    rows="3"
+                    value={form.roomInfo}
+                    onChange={(e) => set("roomInfo", e.target.value)}
+                    placeholder="Describe the room and living arrangement"
+                  />
+                </Field>
               </div>
             </>
           )}
           {Object.entries(habitNames).map(([k, label]) => (
-            <Field key={k} label={label}>
+            <Field key={k} label={label} id={`profile-habit-${k}`}>
               <select value={form[k]} onChange={(e) => set(k, e.target.value)}>
                 {habitOptions(k).map((o) => (
                   <option key={o} value={o}>
@@ -1477,34 +1514,32 @@ function NewProfile() {
               </select>
             </Field>
           ))}
-          <Field label="Contact phone" required error={errors.phone}>
+          <Field label="Contact phone" required error={errors.phone} id="profile-phone">
             <input
+              type="tel"
+              autoComplete="tel"
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
               placeholder="0912345678"
             />
           </Field>
-          <div className="field full-field">
-            <span>
-              A little about you <i>*</i>
-            </span>
-            <textarea
-              rows="4"
-              value={form.intro}
-              onChange={(e) => set("intro", e.target.value)}
-              placeholder="What do you enjoy? What kind of home are you hoping for?"
-            />
-            {errors.intro && (
-              <small className="field-error">{errors.intro}</small>
-            )}
+          <div className="full-field">
+            <Field label="A little about you" required error={errors.intro} id="profile-intro">
+              <textarea
+                rows="4"
+                value={form.intro}
+                onChange={(e) => set("intro", e.target.value)}
+                placeholder="What do you enjoy? What kind of home are you hoping for?"
+              />
+            </Field>
           </div>
         </div>
         <div className="form-submit">
           <span>
-            <ShieldCheck size={16} /> Your details stay on this demo device.
+            <ShieldCheck size={16} aria-hidden="true" /> Your details stay on this demo device.
           </span>
           <button className="button button-primary">
-            Publish my profile <ArrowRight size={16} />
+            Publish my profile <ArrowRight size={16} aria-hidden="true" />
           </button>
         </div>
       </form>
@@ -2004,14 +2039,16 @@ function Login() {
         email,
         role: "user",
         profileId: "profile-me",
+        avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80",
       });
       nav(next);
     } else if (email === "admin@tronest.demo" && password === "admin123") {
       setUser({
         id: "admin-demo",
-        name: "Jamie (Admin)",
+        name: "Jamie",
         email,
         role: "admin",
+        avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80",
       });
       nav("/admin");
     } else setError("That email and password do not match our demo accounts.");
@@ -2044,49 +2081,73 @@ function Login() {
           </h1>
           <p>Sign in to keep finding your place.</p>
           <form className="form-stack" onSubmit={submit}>
-            <Field label="Email address">
+            <Field label="Email address" id="login-email">
               <input
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </Field>
-            <Field label="Password">
+            <Field label="Password" id="login-password">
               <input
                 type="password"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Field>
-            {error && <p className="login-error">{error}</p>}
+            {error && <p className="login-error" role="alert">{error}</p>}
             <button className="button button-primary button-full">
-              Sign in <ArrowRight size={16} />
+              Sign in <ArrowRight size={16} aria-hidden="true" />
             </button>
           </form>
           <div className="demo-accounts">
-            <strong>Try the demo</strong>
+            <strong>Quick Demo Sign In</strong>
             <button
+              type="button"
+              className="demo-account-btn"
               onClick={() => {
                 setEmail("user@tronest.demo");
                 setPassword("123456");
               }}
             >
-              <UserRound size={15} /> User{" "}
-              <span>user@tronest.demo / 123456</span>
+              <img
+                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+                alt="Alex Nguyen"
+                className="avatar avatar-small"
+              />
+              <div className="demo-account-info">
+                <span className="demo-account-name">
+                  Alex Nguyen <span className="demo-badge">User</span>
+                </span>
+                <span className="demo-account-cred">user@tronest.demo / 123456</span>
+              </div>
             </button>
             <button
+              type="button"
+              className="demo-account-btn"
               onClick={() => {
                 setEmail("admin@tronest.demo");
                 setPassword("admin123");
               }}
             >
-              <ShieldCheck size={15} /> Admin{" "}
-              <span>admin@tronest.demo / admin123</span>
+              <img
+                src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=120&q=80"
+                alt="Jamie Admin"
+                className="avatar avatar-small"
+              />
+              <div className="demo-account-info">
+                <span className="demo-account-name">
+                  Jamie <span className="demo-badge demo-badge-admin">Admin</span>
+                </span>
+                <span className="demo-account-cred">admin@tronest.demo / admin123</span>
+              </div>
             </button>
           </div>
         </div>
         <div className="login-foot">
-          A thoughtful place to land <span>✳</span>
+          A thoughtful place to land <Sparkles size={13} className="inline text-brand-gold" aria-hidden="true" />
         </div>
       </div>
     </div>
@@ -2169,7 +2230,7 @@ function AdminPage() {
         {filtered.length ? (
           filtered.map((r) => (
             <div className="admin-card" key={r.id}>
-              <img src={r.images?.[0]} alt="" />
+              <img src={r.images?.[0]} alt={r.title} loading="lazy" />
               <div className="admin-card-info">
                 <span className="eyebrow">
                   {r.area} · {money(r.price)}/mo

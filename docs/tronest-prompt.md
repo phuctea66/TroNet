@@ -234,3 +234,28 @@ tronest/
 2. Cung cấp **đầy đủ code** cho từng file (không viết tắt, không để "...").
 3. Đưa các lệnh khởi tạo (Vite + Tailwind + react-router-dom + lucide-react) và hướng dẫn chạy local.
 4. Cuối cùng liệt kê ngắn gọn những giả định bạn đã đặt ra (nếu có).
+
+---
+
+## 11. Vấn đề cần sửa 
+
+
+Tóm tắt vấn đề chính phát hiện:
+
+**Critical (cần sửa ngay):**
+
+ - Accessibility: Thiếu aria-describedby trên form errors, thiếu skip-to-content, icon decorative không có aria-hidden
+ - Touch targets: Heart button chỉ 35×35px (cần ≥44×44px), body font 14px gây auto-zoom iOS
+ - Viewport zoom blocked: user-scalable=no vi phạm WCAG
+
+**High Priority:**
+
+ - Background color sai: Đang dùng #f7f6f2, prompt yêu cầu #F4F7F9
+ - Border radius không thống nhất: Mix giữa 7px/9px/11px/12px/13px, prompt yêu cầu rounded-lg đồng nhất
+ - Emoji ✳ dùng làm icon: Cần thay bằng SVG icon (Lucide Sparkles)
+ - Mobile filter bị ẩn hoàn toàn
+
+**Medium:**
+
+ - Form thiếu type="tel", autocomplete, toast thiếu aria-live="polite"
+ - Thiếu loading="lazy" trên ảnh dưới fold
